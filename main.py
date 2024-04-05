@@ -1,6 +1,6 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
-from rest_controller import RestController
+from utils.rest_controller import RestController
 
 class MyHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -14,5 +14,3 @@ def run(server_class=HTTPServer, handler_class=MyHandler):
     server_address = ('', 8000)
     httpd = server_class(server_address, handler_class)
     httpd.serve_forever()
-
-run()
