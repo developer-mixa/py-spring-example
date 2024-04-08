@@ -19,7 +19,7 @@ class Test(RestController):
     def index_test(self, httpHandler: BaseHTTPRequestHandler):
         httpHandler.send_response(200)
         self.write(httpHandler, 'Index html')
-
-
-test = Test()
-test.run()
+\
+if __name__ == '__main__':
+    test = Test()
+    test.run()

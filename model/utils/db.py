@@ -1,7 +1,7 @@
 import os
 
 import dotenv
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine as create_engine_sql
 
 
 def __get_db_url() -> str:
@@ -11,4 +11,4 @@ def __get_db_url() -> str:
     return 'postgresql+psycopg://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DBNAME}'.format(**credentials)
 
 def create_engine():
-    return create_engine(__get_db_url())
+    return create_engine_sql(__get_db_url())

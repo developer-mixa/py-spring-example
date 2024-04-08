@@ -9,6 +9,11 @@ class RestController:
     __CONTENT_TYPE = 'Content-type'
     __TEXT_HTML = 'text/html'
 
+    #Settings
+    __IP__ = ''
+    __BASE_URL__ = ''
+    __PORT__ = 8000
+
     #All queries with routes
     _get_queries = {}
     _post_queries = {}
@@ -16,9 +21,7 @@ class RestController:
     _delete_queries = {}
     
     #Base init
-    def __init__(self, base_url = '', port = 8000) -> None:
-        self.base_url = base_url
-        self.port = port
+    def __init__(self) -> None:
         self.init_routes()
 
     def init_routes(self):
@@ -26,16 +29,16 @@ class RestController:
 
     #Add-route methods
     def add_get_route(self, query, function):
-        self._get_queries[query] = function
+        self._get_queries[self.__BASE_URL__ + query] = function
     
     def add_post_route(self, query, function):
-        self._post_queries[query] = function
+        self._post_queries[self.__BASE_URL__ + query] = function
 
     def add_put_route(self, query, function):
-        self._put_queries[query] = function
+        self._put_queries[self.__BASE_URL__ + query] = function
 
     def add_delete_route(self, query, function):
-        self._delete_queries[query] = function
+        self._delete_queries[self.__BASE_URL__ + query] = function
 
     #helper methods
     def add_header(self, httpHandler: BaseHTTPRequestHandler, keyword: str, value: str):
@@ -46,7 +49,10 @@ class RestController:
         self.add_header(httpHandler, self.__CONTENT_TYPE, self.__TEXT_HTML)
 
     def write(self, httpHandler: BaseHTTPRequestHandler, value: Any):
-        httpHandler.wfile.write(value.encode(self.__ENCODING))
+        if(isinstance(value, list)):
+            httpHandler.wfile.write(str(value).encode(self.__ENCODING))
+        else:
+            httpHandler.wfile.write(value.encode(self.__ENCODING))
 
     #Create handler with our routes
     def __create_handler(self):
@@ -94,7 +100,7 @@ class RestController:
     
     #Run our server
     def run(self, server_class=HTTPServer):
-        server_address = (self.base_url, self.port)
+        server_address = (self.__IP__, self.__PORT__)
         handler_class = self.__create_handler()
         httpd = server_class(server_address, handler_class)
         httpd.serve_forever()
