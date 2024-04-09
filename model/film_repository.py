@@ -13,3 +13,7 @@ class FilmRepository:
     def get_films(self) -> list[Film]:
         with Session(self.__engine) as session:
             return session.scalars(select(Film)).fetchall()
+    
+    def add_film(self) -> None:
+        with Session(self.__engine) as session:
+            return session.add()
