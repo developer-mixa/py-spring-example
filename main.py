@@ -5,10 +5,10 @@ from controller.utils.rest_controller import GlobalRestController
 globalRestController = GlobalRestController(
     ip='',
     port=8000,
-    controllers=(
+    controllers=[
         FilmController(),
         ActorController()
-    )
+    ]
 )
 
 globalRestController.run()

@@ -3,7 +3,6 @@ from controller.utils.query_type import QueryType
 from http.server import BaseHTTPRequestHandler
 from model.film_repository import FilmRepository
 from model.models import Film
-import json
 
 
 class FilmController(RestController):
