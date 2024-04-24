@@ -2,7 +2,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from typing import Any
 from view.views import main_page
 from controller.utils.query_type import QueryType
-from pprint import pprint
+from controller.utils.exceptions import PathRedefinitionException
 
 class RestController:
 
@@ -27,10 +27,17 @@ class RestController:
 
     #Add-route methods
 
-    def add_route(self, query_type: QueryType, query, function):
+    def add_route(self, query_type: QueryType, query: str, function, autocompletion: bool=True):
         if query_type not in self.queries:
             self.queries[query_type] = {}
+        if self.queries[query_type].get(self.__BASE_URL__ + query):
+            raise PathRedefinitionException(query)
         self.queries[query_type][self.__BASE_URL__ + query] = function
+        if autocompletion and query[len(query)-1] != '/':
+            self.queries[query_type][self.__BASE_URL__ + query + '/'] = function
+        elif autocompletion and query[len(query)-1] == '/':
+            self.queries[query_type][self.__BASE_URL__ + query[:-1]] = function
+
 
     #helper methods
     def add_header(self, httpHandler: BaseHTTPRequestHandler, keyword: str, value: str):

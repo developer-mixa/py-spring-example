@@ -13,4 +13,3 @@ class ActorController(RestController):
 
     def get_actors(self, httpHandler: BaseHTTPRequestHandler):
         self.write(httpHandler, 'actors')
-        
