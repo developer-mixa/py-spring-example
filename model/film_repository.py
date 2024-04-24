@@ -14,6 +14,8 @@ class FilmRepository:
         with Session(self.__engine) as session:
             return session.scalars(select(Film)).fetchall()
     
-    def add_film(self) -> None:
+    def add_film(self, film: Film) -> None:
         with Session(self.__engine) as session:
-            return session.add()
+            session.add(film)
+            session.commit()
+            return film.id

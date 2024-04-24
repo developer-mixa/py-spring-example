@@ -1,5 +1,9 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from typing import Any
+from view.views import main_page
+from typing import Callable
+from controller.utils.query_type import QueryType
+
 
 class RestController:
 
@@ -7,18 +11,13 @@ class RestController:
     __ENCODING = 'UTF-8'
     __auto_add_header__ = True
     __CONTENT_TYPE = 'Content-type'
-    __TEXT_HTML = 'text/html'
+    __TEXT_JSON = 'text/json'
 
     #Settings
-    __IP__ = ''
     __BASE_URL__ = ''
-    __PORT__ = 8000
 
     #All queries with routes
-    __get_queries = {}
-    __post_queries = {}
-    __put_queries = {}
-    __delete_queries = {}
+    queries : dict[QueryType, dict[str, int]] = {}
     
     #Base init
     def __init__(self) -> None:
@@ -29,92 +28,79 @@ class RestController:
 
     #Add-route methods
 
-    def __add_route(self,map, query, function):
-        map[self.__BASE_URL__ + query] = function
-
-    def add_get_route(self, query, function):
-        self.__add_route(self.__get_queries, query, function)
+    def add_route(self, query_type: QueryType, query, function):
+        self.queries[query_type] = {self.__BASE_URL__ + query: function}
     
-    def add_post_route(self, query, function):
-        self.__add_route(self.__post_queries, query, function)
-
-    def add_put_route(self, query, function):
-        self.__add_route(self.__put_queries, query, function)
-
-    def add_delete_route(self, query, function):
-        self.__add_route(self.__delete_queries, query, function)
-    
-    def page_not_found(self, httpHandler: BaseHTTPRequestHandler):
-        self.write(httpHandler, 'Page if not found')
+    def default_page(self, httpHandler: BaseHTTPRequestHandler):
+        httpHandler.send_response(200)
+        httpHandler.send_header('Content-type', 'text/html')
+        httpHandler.end_headers()
+        httpHandler.wfile.write(main_page().encode(self.__ENCODING))
 
     #Properties
-
-    @property
-    def get_queries(self):
-        return self.__get_queries
     
-    @property
-    def post_queries(self):
-        return self.__post_queries
-    
-    @property
-    def put_queries(self):
-        return self.__put_queries
-    
-    @property
-    def delete_queries(self):
-        return self.__delete_queries 
-
-
     #helper methods
     def add_header(self, httpHandler: BaseHTTPRequestHandler, keyword: str, value: str):
         httpHandler.send_header(keyword, value)
         httpHandler.end_headers()
 
     def add_default_header(self, httpHandler: BaseHTTPRequestHandler):
-        self.add_header(httpHandler, self.__CONTENT_TYPE)
+        self.add_header(httpHandler, self.__CONTENT_TYPE, self.__TEXT_JSON)
 
     def write(self, httpHandler: BaseHTTPRequestHandler, value: Any):
         httpHandler.wfile.write(str(value).encode(self.__ENCODING))
 
-    #Create handler with our routes
-    def __create_handler(self):
-        def handler_factory(rest_controller: RestController):
-            class MyHandler(BaseHTTPRequestHandler):
-                def __init__(self, *args, **kwargs):
-                    self.rest_controller = rest_controller
-                    super().__init__(*args, **kwargs)
+    def get_obj_from_body(self, httpHandler: BaseHTTPRequestHandler, cls: Any) -> Any:
+        import json
+        content_length = int(httpHandler.headers['Content-Length'])
+        post_data = httpHandler.rfile.read(content_length).decode(self.__ENCODING)
+        return cls(**json.loads(post_data))
 
-                def execure_query(self, httpHandler: BaseHTTPRequestHandler, do_queries: map) -> bool:
-                    for query, func in do_queries.items():                        
-                        if(httpHandler.path == query):
-                            try:
-                                func(self)
-                            except Exception as e:
-                                self.rest_controller.write(httpHandler, f"Error: 500, message: {e}")
-                            return True
-                    return False     
-
-                def do_GET(self):
-                    if not self.execure_query(self, self.rest_controller.get_queries):
-                        rest_controller.page_not_found(self)
-
-                def do_POST(self):
-                    self.execure_query(self, self.rest_controller.post_queries)
-
-                def do_PUT(self):
-                    self.execure_query(self, self.rest_controller.put_queries)
-
-                def do_DELETE(self):
-                    self.execure_query(self, self.rest_controller.delete_queries)
-
-            return MyHandler
-
-        return handler_factory(self)
+class GlobalRestController:
     
-    #Run our server
+    def __init__(self, ip, port,controllers: list[RestController] | tuple[RestController]) -> None:
+        self.__ip = ip
+        self.__port = port
+        self.__controllers = controllers
+
+
+    def __create_handler(self):
+            def handler_factory(rest_controllers: list[RestController]) -> BaseHTTPRequestHandler:
+                class MyHandler(BaseHTTPRequestHandler):
+                    def __init__(self, *args, **kwargs):
+                        self.rest_controllers = rest_controllers
+                        super().__init__(*args, **kwargs)
+
+                    def execure_query(self, httpHandler: BaseHTTPRequestHandler, do_queries: map) -> bool:
+                        for query, func in do_queries.items():                        
+                            if(httpHandler.path == query):
+                                func(self)
+                                return True
+                        return False     
+
+                    def do_GET(self):
+                        for rest_controller in self.rest_controllers:
+                            if not self.execure_query(self, rest_controller.queries[QueryType.GET]):
+                                rest_controller.default_page(self)
+
+                    def do_POST(self):
+                        for rest_controller in self.rest_controllers:
+                            self.execure_query(self, rest_controller.queries[QueryType.POST])
+
+                    def do_PUT(self):
+                        for rest_controller in self.rest_controllers:
+                            self.execure_query(self, rest_controller.queries[QueryType.PUT])
+
+                    def do_DELETE(self):
+                        for rest_controller in self.rest_controllers:
+                            self.execure_query(self, rest_controller.queries[QueryType.DELETE])
+
+                return MyHandler
+
+            return handler_factory(self.__controllers)
+        
     def run(self, server_class=HTTPServer):
-        server_address = (self.__IP__, self.__PORT__)
+        server_address = (self.__ip, self.__port)
         handler_class = self.__create_handler()
         httpd = server_class(server_address, handler_class)
-        httpd.serve_forever()
+        httpd.serve_forever()        

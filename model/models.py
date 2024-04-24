@@ -15,6 +15,9 @@ class Film(UUIDMixin, Base):
 
     actors: Mapped[list['Actor']] = relationship("Actor", secondary='film_to_actor', back_populates='films')
 
+    def __str__(self) -> str:
+        return f'name={self.name}, description={self.description}, rating={self.rating}'
+
     __table_args__ = (
         CheckConstraint("LENGTH(name) > 0"),
         CheckConstraint("LENGTH(description) > 0"),

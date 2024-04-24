@@ -1,0 +1,1 @@
+MAIN_PAGE = 'view/templates/index.html'
