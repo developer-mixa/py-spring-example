@@ -16,12 +16,12 @@ class FilmController(RestController):
     def get_films(self, httpHandler: BaseHTTPRequestHandler):
         httpHandler.send_response(OK)
         self.single_header(httpHandler, 'CONTENT-TYPE', 'text/html')
-        self.write(httpHandler, films_view(self.film_repository.get_films()))
+        self.write(httpHandler, films_view(self.film_repository.get()))
 
     @PostMapping('/create')
     def add_film(self, httpHandler: BaseHTTPRequestHandler):
         film = self.get_obj_from_body(httpHandler, Film)
-        film_id = self.film_repository.add_film(film)
+        film_id = self.film_repository.add(film)
         httpHandler.send_response(OK)
         self.add_default_header(httpHandler)
         self.write(httpHandler, film_id)
@@ -29,7 +29,7 @@ class FilmController(RestController):
     @PutMapping('/update')
     def update_film(self, httpHandler: BaseHTTPRequestHandler):
         film = self.get_obj_from_body(httpHandler, Film)
-        film_id = self.film_repository.update_film(film)
+        film_id = self.film_repository.update(film)
         httpHandler.send_response(OK)
         self.add_default_header(httpHandler)
         self.write(httpHandler, film_id)
