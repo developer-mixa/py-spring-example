@@ -4,6 +4,9 @@ from view.views import main_page
 from controller.utils.query_type import QueryType
 from controller.utils.exceptions import PathRedefinitionException
 
+
+# Controllers
+
 class RestController:
 
     # Constants
@@ -20,10 +23,14 @@ class RestController:
     
     #Base init
     def __init__(self) -> None:
-        self.init_routes()
+        self.__init_routes()
 
-    def init_routes(self):
-        pass
+    def __init_routes(self):
+        for attr_name in dir(self):
+            attr = getattr(self, attr_name)
+            if callable(attr) and hasattr(attr, 'route_info'):
+                query_type, path = attr.route_info
+                self.add_route(query_type, path, attr)
 
     #Add-route methods
 
@@ -40,12 +47,12 @@ class RestController:
 
 
     #helper methods
-    def add_header(self, httpHandler: BaseHTTPRequestHandler, keyword: str, value: str):
+    def single_header(self, httpHandler: BaseHTTPRequestHandler, keyword: str, value: str):
         httpHandler.send_header(keyword, value)
         httpHandler.end_headers()
 
     def add_default_header(self, httpHandler: BaseHTTPRequestHandler):
-        self.add_header(httpHandler, self.__CONTENT_TYPE, self.__TEXT_JSON)
+        self.single_header(httpHandler, self.__CONTENT_TYPE, self.__TEXT_JSON)
 
     def write(self, httpHandler: BaseHTTPRequestHandler, value: Any):
         httpHandler.wfile.write(str(value).encode(self.__ENCODING))

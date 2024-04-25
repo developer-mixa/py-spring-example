@@ -1,28 +1,39 @@
 from controller.utils.rest_controller import RestController
-from controller.utils.query_type import QueryType
+from controller.utils.mappings import RequestMapping, GetMapping, PostMapping, PutMapping, DeleteMapping
 from http.server import BaseHTTPRequestHandler
 from model.film_repository import FilmRepository
 from model.models import Film
+from view.views import films as films_view
+from controller.utils.responses import OK
 
 
+@RequestMapping('/films')
 class FilmController(RestController):
-
-    __BASE_URL__ = '/films'
 
     film_repository = FilmRepository()
 
-    def init_routes(self):
-        self.add_route(QueryType.GET, '/', self.get_films)
-        self.add_route(QueryType.POST, '/create', self.add_film)
-    
+    @GetMapping('/')
     def get_films(self, httpHandler: BaseHTTPRequestHandler):
-        httpHandler.send_response(200)
-        self.add_default_header(httpHandler)
-        self.write(httpHandler, "something")
+        httpHandler.send_response(OK)
+        self.single_header(httpHandler, 'CONTENT-TYPE', 'text/html')
+        self.write(httpHandler, films_view(self.film_repository.get_films()))
 
+    @PostMapping('/create')
     def add_film(self, httpHandler: BaseHTTPRequestHandler):
         film = self.get_obj_from_body(httpHandler, Film)
         film_id = self.film_repository.add_film(film)
-        httpHandler.send_response(200)
-        self.add_default_header()
+        httpHandler.send_response(OK)
+        self.add_default_header(httpHandler)
         self.write(httpHandler, film_id)
+    
+    @PutMapping('/update')
+    def update_film(self, httpHandler: BaseHTTPRequestHandler):
+        film = self.get_obj_from_body(httpHandler, Film)
+        film_id = self.film_repository.update_film(film)
+        httpHandler.send_response(OK)
+        self.add_default_header(httpHandler)
+        self.write(httpHandler, film_id)
+    
+    @DeleteMapping('/delete')
+    def delete_film(self, httpHandler: BaseHTTPRequestHandler):
+        pass

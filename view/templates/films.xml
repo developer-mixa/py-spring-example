@@ -1,0 +1,11 @@
+<films>
+    {% for film in films %}
+        <film>
+            <name>{{ film.name }}</name>
+            <description>{{ film.description }}</description>
+            <rating>{{ film.rating }}</rating>
+        </film>
+        <br>
+    {% endfor %}
+</films>
+    

@@ -9,6 +9,7 @@ class Base(DeclarativeBase):
 class Film(UUIDMixin, Base):
     __tablename__ = 'film'
 
+
     name: Mapped[str] = mapped_column(String(80))
     description: Mapped[str] = mapped_column(String(1024))
     rating: Mapped[float] = mapped_column(Float)

@@ -1,0 +1,19 @@
+<films>
+    {% for film in films %}
+        <film>
+            <name>{{ film.name }}</name>
+            <description>{{ film.description }}</description>
+            <rating>{{ film.rating }}</rating>
+            <actors>
+            {% for actor in film.actors %}
+                <actor>
+                    <name>{{ actor.name }}</name>
+                    <birthdate>{{ actor.birthdate }}</birthdate>
+                    <nationality>{{ actor.nationality }}</nationality>
+                </actor>
+            {% endfor %}
+            </actors>
+        </film>
+    {% endfor %}
+    </films>
+    
