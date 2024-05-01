@@ -1,11 +1,23 @@
-<films>
+<style>
+.films-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+ grid-gap: 10px;
+}
+
+.film {
+ background-color: #f0f0f0;
+ padding: 10px;
+ border-radius: 5px;
+}
+</style>
+
+<div class="films-grid">
     {% for film in films %}
-        <film>
-            <name>{{ film.name }}</name>
-            <description>{{ film.description }}</description>
-            <rating>{{ film.rating }}</rating>
-        </film>
-        <br>
+        <div class="film">
+            <h3>{{ film.name }}</h3>
+            <p>{{ film.description }}</p>
+            <p>Rating: {{ film.rating }}</p>
+        </div>
     {% endfor %}
-</films>
-    
+</div>

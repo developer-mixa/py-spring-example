@@ -19,3 +19,9 @@ def films(films_data: list):
     template = env.get_template(config.FILMS)
 
     return template.render(films=films_data)
+
+def actors(actors_data: list):
+
+    template = env.get_template(config.ACTORS)
+
+    return template.render(actors=actors_data)

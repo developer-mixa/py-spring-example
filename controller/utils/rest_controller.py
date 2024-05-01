@@ -57,11 +57,17 @@ class RestController:
     def write(self, httpHandler: BaseHTTPRequestHandler, value: Any):
         httpHandler.wfile.write(str(value).encode(self.__ENCODING))
 
+    def get_request(self, httpHandler: BaseHTTPRequestHandler, key: str):
+        import json
+        content_length = int(httpHandler.headers['Content-Length'])
+        data = httpHandler.rfile.read(content_length).decode(self.__ENCODING)
+        return json.loads(data)[key]
+
     def get_obj_from_body(self, httpHandler: BaseHTTPRequestHandler, cls: Any) -> Any:
         import json
         content_length = int(httpHandler.headers['Content-Length'])
-        post_data = httpHandler.rfile.read(content_length).decode(self.__ENCODING)
-        return cls(**json.loads(post_data))
+        data = httpHandler.rfile.read(content_length).decode(self.__ENCODING)
+        return cls(**json.loads(data))
 
 class GlobalRestController:
     

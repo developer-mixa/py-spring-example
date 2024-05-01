@@ -1,0 +1,24 @@
+<style>
+    .actors-grid {
+     display: grid;
+     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+     grid-gap: 10px;
+    }
+    
+    .actor-card {
+     background-color: #f0f0f0;
+     padding: 10px;
+     border-radius: 5px;
+    }
+    </style>
+    
+    <div class="actors-grid">
+        {% for actor in actors %}
+            <div class="actor-card">
+                <h3>{{ actor.name }}</h3>
+                <p>surname: {{ actor.surname }}</p>
+                <p>age: {{ actor.age }}</p>
+            </div>
+        {% endfor %}
+    </div>
+    
