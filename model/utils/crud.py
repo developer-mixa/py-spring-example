@@ -1,5 +1,4 @@
 """Model with CrudRepository."""
-from typing import type
 from uuid import UUID
 
 from sqlalchemy import Engine, select, text
