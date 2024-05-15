@@ -1,14 +1,17 @@
-from controller.film_controller import FilmController
+"""Main file."""
 from controller.actor_controller import ActorController
+from controller.film_controller import FilmController
 from controller.utils.rest_controller import GlobalRestController
 
-globalRestController = GlobalRestController(
+PORT = 8000
+
+global_controller = GlobalRestController(
     ip='',
-    port=8000,
+    port=PORT,
     controllers=[
         FilmController(),
-        ActorController()
-    ]
+        ActorController(),
+    ],
 )
 
-globalRestController.run()
+global_controller.run()

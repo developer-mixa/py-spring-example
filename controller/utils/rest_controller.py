@@ -3,6 +3,12 @@ from typing import Any
 from view.views import main_page
 from controller.utils.query_type import QueryType
 from controller.utils.exceptions import PathRedefinitionException
+from controller.utils.mappings import GetMapping, PostMapping, DeleteMapping, PutMapping
+from controller.utils.responses import OK, CREATED, NO_CONTENT, NOT_FOUND, SERVER_ERROR
+from typing import ClassVar, Callable
+from model.utils.crud import CrudRepository
+from model.utils.exceptions import NotFound
+from uuid import UUID
 
 
 # Controllers
@@ -128,4 +134,49 @@ class GlobalRestController:
         server_address = (self.__ip, self.__port)
         handler_class = self.__create_handler()
         httpd = server_class(server_address, handler_class)
-        httpd.serve_forever()        
+        httpd.serve_forever()
+
+
+class SimpleRestController(RestController):
+
+    model_class: ClassVar
+    crud_repository: CrudRepository
+
+    get_view: Callable
+
+    @GetMapping('/')
+    def get_films(self, httpHandler: BaseHTTPRequestHandler):
+        httpHandler.send_response(OK)
+        self.single_header(httpHandler, 'CONTENT-TYPE', 'text/html')
+        data = self.crud_repository.get()
+        self.write(httpHandler, self.get_view(data))
+    
+    @PostMapping('/create')
+    def add_film(self, httpHandler: BaseHTTPRequestHandler):
+        film = self.get_obj_from_body(httpHandler, self.model_class)
+        film_id = self.crud_repository.add(film)
+        httpHandler.send_response(CREATED)
+        self.add_default_header(httpHandler)
+        self.write(httpHandler, film_id)
+    
+    @PutMapping('/update')
+    def update_film(self, httpHandler: BaseHTTPRequestHandler):
+        film = self.get_obj_from_body(httpHandler, self.model_class)
+        film_id = self.crud_repository.update(film)
+        httpHandler.send_response(OK)
+        self.add_default_header(httpHandler)
+        self.write(httpHandler, film_id)
+    
+    @DeleteMapping('/delete')
+    def delete_film(self, httpHandler: BaseHTTPRequestHandler):
+        try:
+            self.crud_repository.remove(UUID(self.get_request(httpHandler, 'id')))
+            httpHandler.send_response(NO_CONTENT)
+            self.add_default_header(httpHandler)
+        except NotFound:
+            httpHandler.send_response(NOT_FOUND)
+            self.add_default_header(httpHandler)
+        except Exception as e:
+            print(e)
+            httpHandler.send_response(SERVER_ERROR)
+            self.add_default_header(httpHandler)

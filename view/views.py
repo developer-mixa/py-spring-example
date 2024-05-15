@@ -14,13 +14,13 @@ def __load_page(template_path: str, formating: Optional[dict] = None):
 def main_page():
     return __load_page(config.MAIN_PAGE)
 
-def films(films_data: list):
+def films(_,films_data: list,):
 
     template = env.get_template(config.FILMS)
 
     return template.render(films=films_data)
 
-def actors(actors_data: list):
+def actors(_,actors_data: list):
 
     template = env.get_template(config.ACTORS)
 
