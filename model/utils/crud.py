@@ -13,8 +13,8 @@ class CrudRepository:
 
     Example:
         class PersonRepository(CrudRepository):
-        _engine = your_engine()
-        _model_class = Person
+            _engine = your_engine()
+            _model_class = Person
     """
 
     _engine: Engine
