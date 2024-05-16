@@ -15,7 +15,7 @@ def default_wrap_exceptions(func):
     """
     def wrapper(self, http_handler):
         try:
-            func()
+            func(self, http_handler)
         except Exception:
             http_handler.send_response(SERVER_ERROR)
             self.write(http_handler, MESSAGE_INTERNAL_SERVER_ERROR)
