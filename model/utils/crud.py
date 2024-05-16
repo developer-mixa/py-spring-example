@@ -4,6 +4,7 @@ from uuid import UUID
 from sqlalchemy import Engine, select, text
 from sqlalchemy.orm import Session
 
+from model.utils.decorators import check_connection
 from model.utils.exceptions import NotFound
 
 
@@ -19,6 +20,7 @@ class CrudRepository:
     _engine: Engine
     _model_class: type
 
+    @check_connection
     def get(self) -> list[type]:
         """Get all model class objects.
 
@@ -28,6 +30,7 @@ class CrudRepository:
         with Session(self._engine) as session:
             return session.scalars(select(self._model_class)).fetchall()
 
+    @check_connection
     def add(self, model_class: type) -> UUID:
         """Add model class to database.
 
@@ -42,6 +45,7 @@ class CrudRepository:
             session.commit()
             return model_class.id
 
+    @check_connection
     def update(self, updated_model_class: type) -> UUID:
         """Update object by Updated class.
 
@@ -67,6 +71,7 @@ class CrudRepository:
             session.commit()
             return model.id
 
+    @check_connection
     def remove(self, model_id: UUID):
         """Remove object by id.
 

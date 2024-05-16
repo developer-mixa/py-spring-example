@@ -1,3 +1,4 @@
+"""Module for all server responses."""
 OK = 200
 NO_CONTENT = 204
 CREATED = 201
