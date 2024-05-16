@@ -1,3 +1,5 @@
+-- migrate:up
+
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE IF NOT EXISTS film(
@@ -19,3 +21,5 @@ CREATE TABLE IF NOT EXISTS film_to_actor (
 	actor_id uuid REFERENCES actor(id),
 	PRIMARY KEY(film_id, actor_id)
 );
+
+-- migrate:down

@@ -188,7 +188,7 @@ class GlobalRestController:
 
     """
 
-    def __init__(self, ip: str, port: int, controllers: list[RestController]) -> None:
+    def __init__(self, controllers: list[RestController]) -> None:
         """Init of global rest controller.
 
         Args:
@@ -196,8 +196,6 @@ class GlobalRestController:
             port (int): Port for the server
             controllers (list[RestController]): all your controllers
         """
-        self.__ip = ip
-        self.__port = port
         self.__controllers = controllers
         self.__fill_queries()
 
@@ -212,16 +210,21 @@ class GlobalRestController:
         http_handler.end_headers()
         http_handler.wfile.write(main_page().encode(UTF8))
 
-    def run(self, server_class=HTTPServer):
+    def run(self, ip, port, server_class=HTTPServer):
         """Run server with putted ip and port.
 
         Args:
             server_class: class which serve our server.
         """
-        server_address = (self.__ip, self.__port)
+        server_address = (ip, port)
         handler_class = self.__create_handler()
         httpd = server_class(server_address, handler_class)
-        httpd.serve_forever()
+        try:
+            httpd.serve_forever()
+        except Exception as e:
+            print(e)
+        finally:
+            httpd.serve_forever()
 
     def __fill_queries(self):
         self.__all_queries = {}

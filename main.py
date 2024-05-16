@@ -3,15 +3,24 @@ from controller.actor_controller import ActorController
 from controller.film_controller import FilmController
 from controller.utils.rest_controller import GlobalRestController
 
-PORT = 8000
+from dotenv import load_dotenv
+from os import getenv
 
-global_controller = GlobalRestController(
-    ip='',
-    port=PORT,
-    controllers=[
-        FilmController(),
-        ActorController(),
+load_dotenv()
+
+port = int(getenv('SERVER_PORT', 8000))
+ip = getenv('SERVER_HOST', 'localhost')
+
+app = GlobalRestController(
+controllers=[
+    FilmController(),
+    ActorController(),
     ],
 )
 
-global_controller.run()
+def run(*args):
+    app.run(ip=ip, port=port)
+
+
+if __name__ == '__main__':
+    run()
