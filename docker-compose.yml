@@ -2,7 +2,6 @@ version: '3.8'
 services:
   postgres:
     image: 'postgres:15.5'
-    env_file: .env
     ports:
       - ${PG_PORT}:5432
     healthcheck:
@@ -25,7 +24,6 @@ services:
       - "host.docker.internal:host-gateway"
   app:
     build: .
-    env_file: .env
     environment:
       - DEBUG_MODE=false
       - SERVER_HOST=0.0.0.0
