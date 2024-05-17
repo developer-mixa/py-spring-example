@@ -17,6 +17,7 @@ def __get_db_url() -> str:
     """
     dotenv.load_dotenv()
     credentials = [os.environ.get(pg_var) for pg_var in PG_VARS]
+    credentials[2] = os.getenv('POSTGRES_HOST') if os.getenv('DEBUG_MODE') == 'false' else 'localhost'
     return DB_URL + '{0}:{1}@{2}:{3}/{4}'.format(*credentials)
 
 

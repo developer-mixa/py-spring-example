@@ -13,7 +13,7 @@ from controller.utils.exceptions import PathRedefinitionException
 from controller.utils.mappings import (DeleteMapping, GetMapping, PostMapping,
                                        PutMapping)
 from controller.utils.query_type import QueryType
-from controller.utils.responses import (CREATED, NO_CONTENT, NOT_FOUND, OK,
+from controller.utils.responses import (BAD_REQUEST, CREATED, NOT_FOUND, OK,
                                         SERVER_ERROR)
 from model.utils.crud import CrudRepository
 from model.utils.exceptions import NotFound
@@ -317,19 +317,18 @@ class SimpleRestController(RestController):
         Args:
             http_handler (BaseHTTPRequestHandler): your http handler
         """
-        film = self.get_obj_from_body(http_handler, self.model_class)
         response = OK
         try:
-            film_id = self.crud_repository.update(film)
+            model_id = self.crud_repository.update(self.get_obj_from_body(http_handler, self.model_class))
         except NotFound:
             response = NOT_FOUND
-        except Exception:
+        except Exception as exception:
+            print(exception)
             response = SERVER_ERROR
-        else:
-            self.add_default_header(http_handler)
-            self.write(http_handler, film_id)
         finally:
             http_handler.send_response(response)
+            self.add_default_header(http_handler)
+            self.write(http_handler, model_id if response == OK else response)
 
     @DeleteMapping('/delete')
     def delete(self, http_handler: BaseHTTPRequestHandler):
@@ -339,13 +338,22 @@ class SimpleRestController(RestController):
             http_handler (BaseHTTPRequestHandler): your http handler
         """
         response = SERVER_ERROR
+
         try:
-            self.crud_repository.remove(UUID(self.get_request(http_handler, 'id')))
+            model_id = UUID(self.get_request(http_handler, 'id'))
+        except json.JSONDecodeError:
+            http_handler.send_response(BAD_REQUEST)
+            return
+
+        try:
+            self.crud_repository.remove(model_id)
         except NotFound:
             response = NOT_FOUND
         except Exception:
             response = SERVER_ERROR
         else:
-            response = NO_CONTENT
+            response = OK
         finally:
             http_handler.send_response(response)
+            self.add_default_header(http_handler)
+            self.write(http_handler, model_id if response == OK else response)

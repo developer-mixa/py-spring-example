@@ -56,12 +56,14 @@ class CrudRepository:
             NotFound: Raise when object with this id is not found
 
         Returns:
-            UUID: Updated object id
+            UUID: Updated model id
         """
         with Session(self._engine) as session:
             table_name = self._model_class.__tablename__
             query = text(f'SELECT * FROM {table_name} WHERE id = :id')
             model_str = session.execute(query, {'id': updated_model_class.id}).fetchone()
+            if not model_str:
+                raise NotFound(self._model_class)
             model = self._model_class(**model_str._asdict())
             if not model:
                 raise NotFound(self._model_class)
@@ -72,7 +74,7 @@ class CrudRepository:
             return model.id
 
     @check_connection
-    def remove(self, model_id: UUID):
+    def remove(self, model_id: UUID) -> UUID:
         """Remove object by id.
 
         Args:
@@ -80,11 +82,15 @@ class CrudRepository:
 
         Raises:
             NotFound: Raise when object with this id is not found
+
+        Returns:
+            UUID: Deleted model id
         """
         with Session(self._engine) as session:
             table_name = self._model_class.__tablename__
             query = text(f'DELETE FROM {table_name} WHERE id = :id')
-            removed_id = session.execute(query, {'id': model_id})
+            execute_result = session.execute(query, {'id': model_id})
             session.commit()
-            if removed_id.rowcount == 0:
+            if execute_result.rowcount == 0:
                 raise NotFound(self._model_class)
+            return model_id
