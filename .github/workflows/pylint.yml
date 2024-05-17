@@ -32,13 +32,13 @@ jobs:
         pip install numpy
     - name: Start docker container
       run: |
-        export PG_PORT=secrets.PG_PORT
-        export SERVER_PORT=secrets.SERVER_PORT
-        export POSTGRES_DB=secrets.POSTGRES_DB
-        export POSTGRES_USER=secrets.POSTGRES_USER
-        export POSTGRES_PASSWORD=secrets.POSTGRES_PASSWORD
-        export POSTGRES_HOST=secrets.POSTGRES_HOST
-        export SERVER_HOST=secrets.SERVER_HOST
+        export PG_PORT=${{ secrets.PG_PORT }}
+        export SERVER_PORT=${{ secrets.SERVER_PORT }}
+        export POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+        export POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+        export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+        export POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}
+        export SERVER_HOST=${{ secrets.SERVER_HOST }}
         docker compose up
     - name: Pytest
       run: pytest test_rest.py
