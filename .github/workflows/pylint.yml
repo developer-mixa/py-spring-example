@@ -30,16 +30,19 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest==7.4.2
         pip install numpy
+    - name: Make .env file
+      uses: SpicyPizza/create-envfile@v2.0
+      with:
+        envkey_SERVER_PORT: ${{ secrets.SERVER_PORT }}
+        envkey_POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+        envkey_POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+        envkey_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        envkey_POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+        envkey_PG_PORT: ${{ secrets.PG_PORT }}
+        envkey_SERVER_HOST: ${{ secrets.POSTGRES_HOST }}
     - name: Start docker container
       run: |
-        export PG_PORT=${{ secrets.PG_PORT }}
-        export SERVER_PORT=${{ secrets.SERVER_PORT }}
-        export POSTGRES_DB=${{ secrets.POSTGRES_DB }}
-        export POSTGRES_USER=${{ secrets.POSTGRES_USER }}
-        export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
-        export POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}
-        export SERVER_HOST=${{ secrets.SERVER_HOST }}
-        docker compose up
+        docker compose up --build
     - name: Pytest
       run: pytest test_rest.py
     - name: Stop docker container
