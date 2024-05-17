@@ -6,7 +6,7 @@ services:
     ports:
       - ${PG_PORT}:5432
     healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "${PG_USER}", "-d", "${PG_DBNAME}" ]
+      test: [ "CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}" ]
       interval: 1s
       timeout: 10s
       retries: 60
@@ -15,7 +15,7 @@ services:
       - "host.docker.internal:host-gateway"
   migrator:
     image: 'ghcr.io/amacneil/dbmate:2.12'
-    command: -u "postgres://${PG_USER}:${PG_PASSWORD}@host.docker.internal:${PG_PORT}/${PG_DBNAME}?sslmode=disable" up
+    command: -u "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@host.docker.internal:${PG_PORT}/${POSTGRES_DB}?sslmode=disable" up
     volumes:
       - ./migrations:/db/migrations
     depends_on:
