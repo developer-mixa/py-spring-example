@@ -1,26 +1,29 @@
 """Main file."""
+from os import getenv
+
+from dotenv import load_dotenv
+
 from controller.actor_controller import ActorController
 from controller.film_controller import FilmController
 from controller.utils.rest_controller import GlobalRestController
 
-from dotenv import load_dotenv
-from os import getenv
-
 load_dotenv()
 
-port = int(getenv('SERVER_PORT', 8000))
-ip = getenv('SERVER_HOST', 'localhost')
+DEFAULT_PORT = 8000
+DEFAULT_HOST = 'localhost'
+
+port = int(getenv('SERVER_PORT', DEFAULT_PORT))
+ip = getenv('SERVER_HOST', DEFAULT_HOST)
 
 app = GlobalRestController(
-controllers=[
-    FilmController(),
-    ActorController(),
+    ip=ip,
+    port=port,
+    controllers=[
+        FilmController(),
+        ActorController(),
     ],
 )
 
-def run(*args):
-    app.run(ip=ip, port=port)
-
 
 if __name__ == '__main__':
-    run()
+    app.run()
