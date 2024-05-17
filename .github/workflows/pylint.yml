@@ -31,6 +31,9 @@ jobs:
         pip install pytest==7.4.2
         pip install numpy
         pip install requests
+        pip install psycopg==3.1.18
+        pip install SQLAlchemy==2.0.23
+        pip install Jinja2==3.1.2
     - name: Make .env file
       uses: SpicyPizza/create-envfile@v2.0
       with:
