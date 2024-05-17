@@ -10,5 +10,5 @@
 !.vscode/*.code-snippets
 
 # cache
-.pytest_cache
-**/__pycache__
+*pycache*
+*pytest_cache*
