@@ -42,7 +42,7 @@ jobs:
         envkey_SERVER_HOST: ${{ secrets.POSTGRES_HOST }}
     - name: Start docker container
       run: |
-        docker compose up --build
+        docker compose up -d --build
     - name: Pytest
       run: pytest test_rest.py
     - name: Stop docker container
