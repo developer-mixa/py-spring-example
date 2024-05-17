@@ -1,6 +1,10 @@
 version: '3.8'
 services:
   postgres:
+    environment:
+      - POSTGRES_DB=$POSTGRES_DB
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
     image: 'postgres:15.5'
     ports:
       - ${PG_PORT}:5432
@@ -13,6 +17,10 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
   migrator:
+    environment:
+      - POSTGRES_DB=$POSTGRES_DB
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
     image: 'ghcr.io/amacneil/dbmate:2.12'
     command: -u "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@host.docker.internal:${PG_PORT}/${POSTGRES_DB}?sslmode=disable" up
     volumes:
